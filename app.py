@@ -15,7 +15,7 @@ RED = (255, 0, 0)
 IMAGESAVE = False
 
 # Path to the model file "bestmodel.h5"
-MODEL = load_model(r"C:\Users\hasna\OneDrive\Desktop\python\automate\bestmodel.h5")
+MODEL = load_model(r"bestmodel.keras")
 
 LABELS = {
     0: "Zero",

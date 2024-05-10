@@ -59,14 +59,14 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(monitor='val_accuracy', min_delta=0.01, patience=4, verbose=1)
 
 # Model Check Point
-mc = ModelCheckpoint("./bestmodel.h5", monitor='val_accuracy', verbose=1, save_best_only=True)
+mc = ModelCheckpoint("./bestmodel.keras", monitor='val_accuracy', verbose=1, save_best_only=True)
 
 cb = [es, mc]
 
 his = model.fit(X_train, y_train, epochs=50, validation_split=0.3, callbacks=cb)
 
 # give the path to your model
-model_S = keras.models.load_model("bestmodel.h5")
+model_S = keras.models.load_model("bestmodel.keras")
 score = model_S.evaluate(X_test, y_test)
 
 print(f"The model accuracy is {score[1]}")

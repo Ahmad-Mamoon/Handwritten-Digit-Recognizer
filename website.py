@@ -8,7 +8,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
-model = load_model(r"C:\Users\hasna\OneDrive\Desktop\python\automate\bestmodel.h5")
+model = load_model(r"bestmodel.keras")
 
 def preprocess_image(image):
     image = image.convert('L')
