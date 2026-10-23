@@ -3,147 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digit Recognition</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-
-        h1 {
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-
-        canvas {
-            border: 1px solid black;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 16px;
-            margin: 10px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        h2 {
-            color: #333;
-        }
-        .buttons-container {
-    display: flex;
-    justify-content: center;
-}
-    </style>
+    <title>Digit Recognizer</title>
+    <meta name="description" content="Draw a digit and a convolutional neural network trained on MNIST recognises it, right in your browser.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f5bd5'/%3E%3Ctext x='16' y='23' font-family='Arial,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='white'%3E7%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/app.js"></script>
 </head>
 <body>
-    <h1>Handwritten Digit Recognition</h1>
-    <canvas id="canvas" width="280" height="280"></canvas>
-    <br>
-    <div class="buttons-container">
-        <button id="clearBtn">Clear</button>
-        <button id="predictBtn">Predict</button>
-    </div>
-    <h2 id="prediction"></h2>
+    <main class="app">
+        <header class="app-header">
+            <h1>Handwritten Digit Recognizer</h1>
+            <p class="lede">Draw a digit from 0 to 9 and a convolutional neural network trained on MNIST will tell you which one it is.</p>
+        </header>
 
-    <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const clearBtn = document.getElementById('clearBtn');
-    const predictBtn = document.getElementById('predictBtn');
-    const prediction = document.getElementById('prediction');
+        <div class="banner" id="modelBanner" role="alert" hidden>
+            <strong>Couldn't load the model.</strong>
+            Run <code>python train.py</code> (or <code>python export_web_model.py</code>) to create
+            <code>web/model/</code>. On GitHub Pages, make sure that folder is committed.
+        </div>
 
-    let drawing = false;
+        <noscript>
+            <div class="banner">This page needs JavaScript to run the neural network.</div>
+        </noscript>
 
-    canvas.addEventListener('mousedown', () => drawing = true);
-    canvas.addEventListener('mouseup', () => drawing = false);
-    canvas.addEventListener('mousemove', draw);
-    clearBtn.addEventListener('click', clearCanvas);
+        <div class="workspace">
+            <section class="card" aria-labelledby="draw-heading">
+                <div class="card-header">
+                    <h2 id="draw-heading">Draw</h2>
+                    <label class="switch">
+                        <input type="checkbox" id="liveToggle" checked>
+                        <span class="switch-track" aria-hidden="true"></span>
+                        Predict as I draw
+                    </label>
+                </div>
 
-    function draw(event) {
-        if (!drawing) return;
-        const x = event.clientX - canvas.offsetLeft;
-        const y = event.clientY - canvas.offsetTop;
-        ctx.lineWidth = 10;
-        ctx.lineCap = 'round';
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
+                <div class="pad" id="pad">
+                    <canvas id="canvas" width="560" height="560" aria-label="Drawing area. Draw a single digit with your mouse, finger or pen."></canvas>
+                    <p class="pad-hint" id="padHint">Draw a digit here<br><span>or drop an image</span></p>
+                </div>
 
-    function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath(); // Add this line
-    prediction.innerText = '';
-}
+                <div class="toolbar">
+                    <button type="button" class="btn" id="undoBtn" title="Undo last stroke (Ctrl+Z)" disabled>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+                        Undo
+                    </button>
+                    <button type="button" class="btn" id="clearBtn" title="Clear the canvas (Esc)" disabled>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                        Clear
+                    </button>
+                    <label class="btn" title="Predict a digit from an image file">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg>
+                        Upload
+                        <input type="file" id="fileInput" accept="image/*" class="visually-hidden">
+                    </label>
+                    <button type="button" class="btn btn-primary" id="predictBtn" title="Predict (Enter)" disabled>Predict</button>
+                </div>
 
+                <p class="shortcuts"><kbd>Enter</kbd> predict · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Esc</kbd> clear</p>
+            </section>
 
-    function preprocessImage() {
-        const originalCanvas = document.createElement('canvas');
-        originalCanvas.width = 28;
-        originalCanvas.height = 28;
-        const originalCtx = originalCanvas.getContext('2d');
+            <section class="card result" id="resultCard" aria-labelledby="result-heading">
+                <div class="card-header">
+                    <h2 id="result-heading">Prediction</h2>
+                </div>
 
-        originalCtx.drawImage(canvas, 0, 0, 280, 280, 0, 0, 28, 28);
+                <div class="result-main" aria-live="polite">
+                    <output class="result-digit is-placeholder" id="resultDigit" for="canvas">?</output>
+                    <div class="result-details">
+                        <p class="result-status" id="resultStatus">Draw a digit to get started.</p>
+                        <p class="result-note" id="resultNote"></p>
+                        <figure class="model-input" id="modelInputFigure" hidden>
+                            <canvas id="modelInput" width="28" height="28" role="img" aria-label="The 28 by 28 pixel image the model received"></canvas>
+                            <figcaption>What the model sees<br>(28 × 28 pixels)</figcaption>
+                        </figure>
+                    </div>
+                </div>
 
-        const imageData = originalCtx.getImageData(0, 0, 28, 28);
-        const data = imageData.data;
+                <h3 class="subheading">Confidence per digit</h3>
+                <ol class="probabilities" id="probabilities">
+                    <li class="prob"><span class="prob-label">0</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">1</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">2</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">3</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">4</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">5</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">6</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">7</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">8</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                    <li class="prob"><span class="prob-label">9</span><span class="prob-track"><span class="prob-fill"></span></span><span class="prob-value">–</span></li>
+                </ol>
+            </section>
+        </div>
 
-        for (let i = 0; i < data.length; i += 4) {
-            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-            data[i] = data[i + 1] = data[i + 2] = 255 - avg;
-        }
-
-        originalCtx.putImageData(imageData, 0, 0);
-
-        return originalCanvas.toDataURL('image/png');
-    }
-
-    predictBtn.addEventListener('click', async () => {
-        const imageDataUrl = preprocessImage();
-        console.log('Image data URL:', imageDataUrl);
-
-        const formData = new FormData();
-        formData.append('image', imageDataUrl);
-
-        const response = await fetch('/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams(formData)
-        });
-
-        console.log('Response status:', response.status);
-
-        const data = await response.json();
-        console.log('Received JSON data:', data);
-
-        if (data.error) {
-            alert(data.error);
-        } else {
-            prediction.innerText = `Predicted Digit: ${data.predicted_digit}`;
-        }
-    });
-});
-
-
-    </script>
+        <footer class="app-footer">
+            <p id="modelInfo"></p>
+            <p>Runs entirely in your browser. Your drawings never leave your device.</p>
+        </footer>
+    </main>
 </body>
 </html>

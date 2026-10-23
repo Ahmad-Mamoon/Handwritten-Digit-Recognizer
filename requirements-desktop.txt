@@ -1,0 +1,4 @@
+# Extra dependency for the pygame desktop app (desktop.py).
+#   pip install -r requirements-desktop.txt
+-r requirements.txt
+pygame-ce>=2.4

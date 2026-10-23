@@ -1,0 +1,7 @@
+# Store text files with LF line endings in the repository.
+* text=auto
+
+*.keras binary
+*.bin binary
+*.png binary
+*.jpg binary

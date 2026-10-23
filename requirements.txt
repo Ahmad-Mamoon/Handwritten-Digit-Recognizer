@@ -1,0 +1,13 @@
+# Everything needed to train the model and run the web app.
+#   pip install -r requirements.txt
+# Python 3.10-3.14 is supported.
+
+flask>=3.0,<4
+keras>=3.3,<4
+numpy>=1.26
+pillow>=10.0
+
+# Keras needs a numerical backend. JAX is used because it installs on every
+# supported OS and Python version. Prefer TensorFlow? `pip install tensorflow`
+# (Python 3.10-3.13): it's detected and used automatically.
+jax[cpu]>=0.4.30
