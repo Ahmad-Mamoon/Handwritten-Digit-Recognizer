@@ -5,7 +5,7 @@ Draw a digit and a convolutional neural network (CNN) trained on
 The network runs **entirely in your browser**, so the site can be hosted for free on **GitHub Pages**.
 It's trained with **Keras 3** and includes an optional **Flask** API and a **pygame** desktop app.
 
-**Live demo:** https://ahmad-mamoon.github.io/Handwritten-Digit-Recognizer/ (once Pages is enabled; see [below](#deploy-to-github-pages))
+**Live demo:**  [here](https://ahmad-mamoon.github.io/Handwritten-Digit-Recognizer/)
 
 ## Features
 
@@ -52,31 +52,6 @@ model from `file://` pages.)
 To try it on your phone, run `python app.py --host 0.0.0.0` and open
 `http://<your-computer's-IP>:5000` on a device on the same Wi-Fi network.
 
-## Deploy to GitHub Pages
-
-The repository includes a workflow (`.github/workflows/pages.yml`) that publishes the `web/`
-folder on every push to `main`.
-
-1. **Commit the exported model.** The site needs `web/model/model.json` and `web/model/weights.bin`
-   (about 1 MB). Both are created by `python train.py` or `python export_web_model.py`.
-   ```bash
-   git add web/model
-   git commit -m "Add exported model for the website"
-   git push
-   ```
-2. **Turn on Pages.** On GitHub, open the repository's **Settings → Pages**. Under
-   **Build and deployment → Source**, choose **GitHub Actions**.
-3. **Deploy.** Every push to `main` now deploys automatically. For the first deployment, open the
-   **Actions** tab, pick **Deploy to GitHub Pages**, and click **Run workflow** (or just push again).
-
-The site appears at `https://<your-username>.github.io/<repository-name>/`. For this repository,
-that's https://ahmad-mamoon.github.io/Handwritten-Digit-Recognizer/.
-
-If you retrain the model, commit the updated `web/model/` and push. The test suite warns if
-`web/model/` is out of date with `models/digit_model.keras`.
-
-> Only the website is deployed. GitHub Pages can't run Python, so the Flask API isn't available
-> there. The site doesn't need it.
 
 ## Project structure
 
