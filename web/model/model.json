@@ -1,0 +1,146 @@
+{
+ "format": "digit-recognizer-web/1",
+ "input_shape": [
+  28,
+  28,
+  1
+ ],
+ "weights": "weights.bin",
+ "layers": [
+  {
+   "type": "conv2d",
+   "activation": "relu",
+   "kernel": {
+    "offset": 0,
+    "length": 288,
+    "shape": [
+     3,
+     3,
+     1,
+     32
+    ]
+   },
+   "bias": {
+    "offset": 1152,
+    "length": 32,
+    "shape": [
+     32
+    ]
+   }
+  },
+  {
+   "type": "maxpool2d",
+   "pool_size": [
+    2,
+    2
+   ]
+  },
+  {
+   "type": "conv2d",
+   "activation": "relu",
+   "kernel": {
+    "offset": 1280,
+    "length": 18432,
+    "shape": [
+     3,
+     3,
+     32,
+     64
+    ]
+   },
+   "bias": {
+    "offset": 75008,
+    "length": 64,
+    "shape": [
+     64
+    ]
+   }
+  },
+  {
+   "type": "maxpool2d",
+   "pool_size": [
+    2,
+    2
+   ]
+  },
+  {
+   "type": "conv2d",
+   "activation": "relu",
+   "kernel": {
+    "offset": 75264,
+    "length": 73728,
+    "shape": [
+     3,
+     3,
+     64,
+     128
+    ]
+   },
+   "bias": {
+    "offset": 370176,
+    "length": 128,
+    "shape": [
+     128
+    ]
+   }
+  },
+  {
+   "type": "maxpool2d",
+   "pool_size": [
+    2,
+    2
+   ]
+  },
+  {
+   "type": "flatten"
+  },
+  {
+   "type": "dense",
+   "activation": "relu",
+   "kernel": {
+    "offset": 370688,
+    "length": 147456,
+    "shape": [
+     1152,
+     128
+    ]
+   },
+   "bias": {
+    "offset": 960512,
+    "length": 128,
+    "shape": [
+     128
+    ]
+   }
+  },
+  {
+   "type": "dense",
+   "activation": "softmax",
+   "kernel": {
+    "offset": 961024,
+    "length": 1280,
+    "shape": [
+     128,
+     10
+    ]
+   },
+   "bias": {
+    "offset": 966144,
+    "length": 10,
+    "shape": [
+     10
+    ]
+   }
+  }
+ ],
+ "metadata": {
+  "test_accuracy": 0.9944,
+  "test_loss": 0.0171,
+  "epochs": 11,
+  "augmented": true,
+  "parameters": 242602,
+  "keras_version": "3.15.1",
+  "backend": "jax",
+  "trained_at": "2026-10-23T22:44:26+00:00"
+ }
+}
